@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>2.0.2</Version>
+    <Version>2.0.3</Version>
     <PackageReleaseNotes>This release contains a portable class library that targets .NET 4.0, 4.5, and 4.7, .NET Core 1.0, .NET Standard 1.0 and .NET Standard 2.0</PackageReleaseNotes>
   </PropertyGroup>
 
@@ -43,14 +43,14 @@
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <TargetFrameworks>netcoreapp1.0;netstandard1.0;netstandard2.0;net40;net45;net47</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;netstandard1.0;netstandard2.0;net40;net45;net46;net47</TargetFrameworks>
     <OutputPath>$(SolutionDir)lib</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <DebugType>Full</DebugType>
-    <TargetFramework>net47</TargetFramework>
+    <TargetFramework>netstandard1.0</TargetFramework>
   </PropertyGroup>
 
 </Project>
