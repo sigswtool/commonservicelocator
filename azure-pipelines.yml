@@ -1,0 +1,71 @@
+# Build pipeline
+
+trigger:
+- master
+- refs/tags/*
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.csproj'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  BuildVersion: 0
+  
+steps:
+- task: PowerShell@2
+  displayName: 'Set Build Version'
+  inputs:
+    targetType: 'inline'
+    script: |
+      $timestamp = git log -1 --pretty="format:%ct"
+      Write-Host "Build Version: $timestamp" 
+      Write-Host "##vso[task.setvariable variable=BuildVersion]$($timestamp)"
+      $isTag = [regex]::IsMatch($Env:BUILD_SOURCEBRANCH, "^(refs\/tags\/)")
+      Write-Host "##vso[task.setvariable variable=isTag]$($isTag)"
+
+- task: CmdLine@2
+  inputs:
+    script: 'set'
+
+#- task: PowerShell@2
+#  displayName: 'Version Info'
+#  inputs:
+#    targetType: 'inline'
+#    script: |
+#      $version = (Select-Xml -Path ".\package.props" -XPath "/Project/PropertyGroup/VersionBase" | Select-Object -ExpandProperty Node).InnerText
+#      $timestamp = git log -1 --pretty="format:%ct"
+#      Write-Host "Version: $version" 
+#      Write-Host "Time Stamp: $timestamp" 
+#      Write-Host "##vso[task.setvariable variable=STAGE_VERSION]$($version)-$($timestamp)"
+
+
+- task: NuGetToolInstaller@1
+  displayName: 'Install NuGet'
+
+- task: NuGetCommand@2
+  displayName: 'Restore Dependencies'
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  displayName: 'Build'
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSTest@2
+  displayName: 'Test'
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    searchFolder: '$(system.defaultworkingdirectory)\test'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    PathtoPublish: '$(system.defaultworkingdirectory)\src\bin\$(buildPlatform)\$(buildConfiguration)'
+    ArtifactName: 'Binaries'
+

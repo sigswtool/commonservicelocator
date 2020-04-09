@@ -1,12 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <Version>2.0.4</Version>
-    <PackageReleaseNotes>This release contains a portable class library that targets .NET 4.0, 4.5, and 4.7, .NET Core 1.0 and 2.0, .NET Standard 1.0 and .NET Standard 2.0</PackageReleaseNotes>
-  </PropertyGroup>
+  <Import Project="..\package.props" />
 
   <PropertyGroup>
-    <FileVersion>$(Version).0</FileVersion>
     <AssemblyVersion>$(Version).0</AssemblyVersion>
     <PackageId>CommonServiceLocator</PackageId>
     <Summary>The Common Service Locator library contains a shared interface for service location. The library provides an abstraction over IoC containers and service locators.</Summary>
@@ -25,8 +21,14 @@
     <AssemblyOriginatorKeyFile>package.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
     <RootNamespace>CommonServiceLocator</RootNamespace>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;netstandard1.0;netstandard2.0;net40;net45;net46;net47</TargetFrameworks>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <FileVersion Condition="'$(BuildVersion)' == ''">$(Version).0</FileVersion>
+    <FileVersion Condition="'$(BuildVersion)' != ''">$(Version).$(BuildVersion)</FileVersion>
+  </PropertyGroup>
+
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp1.0' OR '$(TargetFramework)' == 'netstandard1.0' OR '$(TargetFramework)' == 'netstandard2.0'">
     <Compile Remove="ActivationException.Desktop.cs" />
@@ -37,19 +39,17 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' != '' AND '$(TargetFramework)' != 'net40' ">
+    <Compile Remove="Exceptions\ActivationException.Desktop.cs" />
     <Compile Remove="net40\**" />
     <EmbeddedResource Remove="net40\**" />
     <None Remove="net40\**" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <OutputPath>$(SolutionDir)lib</OutputPath>
     <DebugType>Portable</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <DebugType>Full</DebugType>
   </PropertyGroup>
 
